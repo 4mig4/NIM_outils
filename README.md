@@ -3,91 +3,59 @@ etudes du language Nim-lang avec outils
 
 Bonjour 
 
-je vous part de mon expérience (très jeune ) de NIM-lang
+je voudrais remercier :  Stefan Salewski
+http://ssalewski.de/gintroreadme.html
 
+et toutes l'équipe du forum Nim
+https://forum.nim-lang.org/
+
+la documentation est très facile à lire 
 https://nim-lang.org/
 
 
-l’installation :
+j'ai beaucoup regardé ce qui ce faisait un peu partout
+et comment aborder le passage à Nim-lang
 
-le plus simple :
+Nim-lang me parrait un excellent compromis , tant sur la fiabilité , que sur la circonsision du language 
+pour ceux qui viennent du c/c++ ou pascal voir python il n'auront aucun problème de compréhention.
+
+j'ai aussi parfois galéré pour faire l'analogie entre mes habitudes et Nim-lang
+par exemple comment faire une structure multidimentions et naviguer dedans 
+ mais cela ma obligé à fouiller sérieusement 
+
+d'autre part j'ai testé beaucoup de produit pour travailler en interactif (GUI) et pas une heures mes des heures pour faire un bon choix.
+pour moi le plus honnêtement possible c'est Gintro  GTK3/4 à la sauce Nim-lang
+
+j'ai été très surpris par la simplicité même si ce n'est pas évident la translation
+
+en travaillant j'ai compris l'intérets d'avoir des macros (hélas je n'ai pas fait dans mon exemple cela viendra ;) )
+
+j'ai déposé mes outils pour facilité le travail.... 
+quelque adresse utiles:
+https://nimble.directory/
+
+https://devdocs.io/
+
+https://hackr.io/tutorials/learn-nim-lang
+
+http://inti.sourceforge.net/tutorial/libinti/cwbuttonboxes.html
+
+https://zestedesavoir.com/tutoriels/870/des-interfaces-graphiques-en-python-et-gtk/1446_decouverte/5775_le-positionnement-grace-aux-layouts/     très bien expliqué good good 
+
+https://www.developpez.net/forums/d1825565/c-cpp/bibliotheques/gtkp/gtkp-c-cpp/gtktreeview-gtkscrolledwindow/
+very good 
+
+je fini par le plus agréable 
+
+un programme pour toutes les plateformes 
+oui vous me direz il faut faire une installation à chaque system , mais c'est comme ça partout , bon pour nim-lang cela m'a pris 5 mn et encore .... GTK c'est plus compliquer mais maintenant on trouve facilement sur les sites GTK comment faire 
+
+quand au base de données c'est strictement pareille 
+
+ne pas confondre environnement de développeur et utilisateur 2 installations différentes 
+
+
 
  
-si vous êtes sur Linnux:
-
-curl https://nim-lang.org/choosenim/init.sh -sSf | sh
-
-pour vos test il n’y a pas mieux …  rien ne vous empêchera par la suite de faire une installation system.
-
-
-
-Puis : nimble list -i
-
-nimble install c2nim // pour les conversions .c,.h … vers .nim
-
-pour l’IDE je vais dir plutôt un éditeur de textes
-
-
-visual studio-Code  allez le prendre sur un snap il sera à part et vous pourrez le mettre à jour facilement 
-
-https://snapcraft.io/vscode
-
-
-choisir les plugins …. important par exemple :
-nim pour travailler agréablement 
-
-    "files.associations": {
-        "*.nim": "nim",
-        "*.inc": "nim",
-        
-    },
-    
-    pour l’indentation et vis versa
-
-indent on space
-
-
-
-
-
-
-commande runner pour faire vos compilations ect 
-dans le settings.json
-
-    "command-runner.commands": {
-        "Glade": "/usr/bin/glade $fileName",
-        "Nim-Debug":"./compile.sh DEBUG $fileName",
-        "Nim-Release":"./compile.sh PROD $fileName",
-        "RUN-NIM":"./$fileName",
-        "GLADE-conv":"$HOME/T_LIB/srcbuildnim -p $dir -f $fileName",
-        "CSS-conv":"$HOME/T_LIB/srccssnim -p $dir -f $fileNameWithoutExt"
-    }
-
-run terminal commande :
-
-cela vous permettra de coller une commande(s) :
- "runTerminalCommand.commands": [
-        {
-            "command": "grep -B2 gtk_builder_new_from_string ~/.nimble/pkgs/gintro-0.5.5/gintro/*",
-            "name": "GREP-GTK"
-        }
-    ]
-
-
-bien utile pour faire la transcription GTK / c  en GTK nim  avec Gintro 
-
-de quoi vous mettre l’eau à la bouche :
-
-http://ssalewski.de/gintroreadme.html
-
-rainbowHighlighter 
-
-vous permet de repairer facilement toutes les variables …. 
-
-open Multifiles :
-pour avoir plusieurs fichiers ouvert comme des onglets …. 
-
-ça devient sympathique ;) 
-
 
 

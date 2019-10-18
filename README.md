@@ -3,7 +3,8 @@ etudes du language Nim-lang avec outils
 
 Bonjour 
 
-je voudrais remercier :  Stefan Salewski
+je voudrais remercier :  Stefan Salewski  
+effectivement ilest simple d'écrire le designe à la main et sans warning ;)
 http://ssalewski.de/gintroreadme.html
 
 et toutes l'équipe du forum Nim

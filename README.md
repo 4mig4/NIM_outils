@@ -25,7 +25,7 @@ j'ai aussi parfois galéré pour faire l'analogie entre mes habitudes et Nim-lan
 par exemple comment faire une structure multidimentions et naviguer dedans 
  mais cela ma obligé à fouiller sérieusement 
 
-d'autre part j'ai testé beaucoup de produit pour travailler en interactif (GUI) et pas une heures mes des heures pour faire un bon choix.
+d'autre part j'ai testé beaucoup de produit pour travailler en interactif (GUI) et pas une heures mais des heures pour faire un bon choix.
 pour moi le plus honnêtement possible c'est Gintro  GTK3/4 à la sauce Nim-lang
 
 j'ai été très surpris par la simplicité même si ce n'est pas évident la translation

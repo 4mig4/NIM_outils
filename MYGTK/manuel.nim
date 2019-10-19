@@ -4,8 +4,6 @@
 # premier jet le 1/10/2019 cohérent
 #
 # en attente 
-# addition de ligne 
-# delete de ligne 
 # faire une requete sqlite voir postgresql
 # une fenêtre modal
 # un appel execv ou un call de programme 
@@ -15,9 +13,10 @@
 # et les exceptions
 #
 #-----------------------------------------
-import gintro/[gtk, gobject, gio, glib]
+import gintro/[glib, gobject, gtk , gdk]
+import gintro/gio 
 
-import gintro/gdk
+
 import strutils
 import strformat
 from strutils import Digits, parseInt
@@ -72,6 +71,7 @@ proc toBoolVal(b: bool): Value =
   discard init(result, gtype)
   setBoolean(result, b)
 
+
 # we need the following two procs for now -- later we will not use that ugly cast...
 proc typeTest(o: gobject.Object; s: string): bool =
   let gt = g_type_from_name(s)
@@ -80,9 +80,6 @@ proc typeTest(o: gobject.Object; s: string): bool =
 proc listStore(o: gobject.Object): gtk.ListStore =
   assert(typeTest(o, "GtkListStore"))
   cast[gtk.ListStore](o)
-
-
-
 
 #----------------------------------
 # declaration Procedure UPDATE SFL
@@ -94,7 +91,11 @@ proc p_GetRowData(pViewTree: TreeView; pPath: TreePath; pColumn: TreeViewColumn)
 
 proc p_SetRowData(b: Button)
 
-proc p_Annul(b: Button; pSelection: TreeSelection)
+proc p_Cancel(b: Button; pSelection: TreeSelection)
+
+proc p_AddRowData(b: Button)
+
+proc p_Delete(b: Button, pSelection: TreeSelection) 
 
 #----------------------------------
 #Procedure Ajustement scrollbar
@@ -135,7 +136,7 @@ proc p_appActivate(app: Application) =
   let  b_Exit = newButton("EXIT")
 
   let  b_Update = newButton("UPDATE")
-  let  b_Annul = newButton("ANNUL")
+  let  b_Cancel = newButton("CANCEL")
   let  b_Add = newButton("ADD")
   let  b_Del = newButton("DEL")
 
@@ -194,8 +195,8 @@ proc p_appActivate(app: Application) =
   context = getStyleContext(b_Update)
   context.addClass("button")
 
-  b_Annul.set_name("b_Annul")
-  context = getStyleContext(b_Annul)
+  b_Cancel.set_name("b_Cancel")
+  context = getStyleContext(b_Cancel)
   context.addClass("button")
 
   b_Add.set_name("b_Add")
@@ -343,7 +344,7 @@ proc p_appActivate(app: Application) =
   butonBox.setLayout(spread )
   butonBox.add(b_Exit)
   butonBox.add(b_Update)
-  butonBox.add(b_Annul)
+  butonBox.add(b_Cancel)
   butonBox.add(b_Add)
   butonBox.add(b_Del)
   butonBox.setHomogeneous(true)
@@ -374,9 +375,9 @@ proc p_appActivate(app: Application) =
 
   connect(b_Exit, "clicked", p_quitapp,app)
   connect(b_Update, "clicked", p_SetRowData)
-  connect(b_Annul, "clicked", p_Annul,gSelection)
-  connect(b_Add, "clicked", p_hello, "Page down")
-  connect(b_Del, "clicked", p_hello, "Page up")
+  connect(b_Cancel, "clicked", p_Cancel,gSelection)
+  connect(b_Add, "clicked", p_AddRowData)
+  connect(b_Del, "clicked", p_Delete,gSelection)
 
   connect(gScrollbar.getVadjustment(),"changed",p_Ajustement)
 
@@ -472,7 +473,7 @@ proc p_GetRowData(pViewTree: TreeView; pPath: TreePath; pColumn: TreeViewColumn)
   let ColName : string = pColumn.getTitle()
 
 
-  echo fmt"p_GetRowData     ColName : ,{ ColName  } "
+  echo fmt"p_GetRowData     ColName : ,{ ColName  } , path: {toString(pPath)} "
 
 
   case ColName
@@ -529,15 +530,15 @@ proc p_SetRowData(b: Button) =
   svPath = ""
   ind_Selection = false
 
-  #----------------------------------------------------------
+#----------------------------------------------------------
 # Procedure Annul la ligne selectioner e purge le Formulaire
 #----------------------------------------------------------
 
-proc p_Annul(b: Button,pSelection:TreeSelection) =
+proc p_Cancel(b: Button,pSelection:TreeSelection) =
 
   if ind_Selection == false  : return
 
-  echo fmt"p_Annul"
+  echo fmt"p_Cancel"
 
   pSelection.unselectAll()
 
@@ -545,4 +546,84 @@ proc p_Annul(b: Button,pSelection:TreeSelection) =
   e_PRENOM.setText("")
   e_Age.setText("")
   svPath = ""
+  ind_Selection = false
+
+#----------------------------------------------------------
+# Procedure Canceled la ligne selectioner e purge le Formulaire
+#----------------------------------------------------------
+
+proc p_AddRowData(b: Button) =
+
+  if ind_Selection == true  : return
+
+  echo fmt"p_AddRowData"
+  
+  personList.add(Person(nom: e_NOM.getText() , prenom: e_PRENOM.getText(), age: parseInt(e_AGE.getText())))
+
+  
+  #  retrived nombre element = next ellement for add
+  var vNbrPerson :int
+  for i in low(personList)..high(personList): 
+    vNbrPerson = i
+
+  let gListStore = listStore(gSFLine.getModel())
+  var gIter: TreeIter
+  gListStore.append(gIter)
+  echo fmt"p_AddRowData   {vNbrPerson }"
+  gListStore.setValue(gIter, col_id,  toUIntVal(vNbrPerson + 1))
+  gListStore.setValue(gIter, col_nom, toStringVal(personList[vNbrPerson].nom))
+  gListStore.setValue(gIter, col_prenom, toStringVal(personList[vNbrPerson].prenom))
+  gListStore.setValue(gIter, col_age,  toUIntVal(personList[vNbrPerson].age))
+  gListStore.setValue(gIter, Color1, toStringVal("SpringGreen"))
+  gListStore.setValue(gIter, Color2, toStringVal("cyan"))
+
+  queueDraw(gSFLine)  # refresh
+
+  e_NOM.setText("")
+  e_PRENOM.setText("")
+  e_Age.setText("")
+  svPath = ""
+
+  ind_Selection = false
+
+
+#----------------------------------------------------------
+# Procedure delete 
+#----------------------------------------------------------
+
+proc p_Delete(b: Button,pSelection:TreeSelection) =
+
+  if ind_Selection == false  : return
+
+  echo fmt"Delete   , {svPath} "
+
+
+
+  var i: int = parseInt(svPath)
+  personList.delete(i)
+  
+  # fausse l'index preferer clear et recharger la liste
+  pSelection.unselectAll()
+  let gListStore = listStore(gSFLine.getModel())
+  clear(gListStore)
+
+  for i in low(personList)..high(personList):
+    var gIter: TreeIter
+    gListStore.append(gIter) # currently we have to use setValue() as there is no varargs proc as in C original
+    
+    gListStore.setValue(gIter, col_id,  toUIntVal(i + 1))
+    gListStore.setValue(gIter, col_nom, toStringVal(personList[i].nom))
+    gListStore.setValue(gIter, col_prenom, toStringVal(personList[i].prenom))
+    gListStore.setValue(gIter, col_age,  toUIntVal(personList[i].age))
+    gListStore.setValue(gIter, Color1, toStringVal("SpringGreen"))
+    gListStore.setValue(gIter, Color2, toStringVal("cyan"))
+
+  queueDraw(gSFLine)  # refresh
+
+  e_NOM.setText("")
+  e_PRENOM.setText("")
+  e_Age.setText("")
+  svPath = ""
+
+
   ind_Selection = false

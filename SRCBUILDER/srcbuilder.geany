@@ -28,10 +28,10 @@ long_line_behaviour=1
 long_line_column=120
 
 [files]
-current_page=0
+current_page=-1
 
 [VTE]
-last_dir=$HOME
+last_dir=/home/soleil
 
 [build-menu]
 MakeFT_00_LB=Construire

@@ -41,7 +41,10 @@ personList.add(Person(nom: "Koch", prenom:"karl", age: 23))
 personList.add(Person(nom: "Pan", prenom:"Peter", age: 12))
 personList.add(Person(nom: "Rouge", prenom:"JP", age: 68))
 personList.add(Person(nom: "Moranne", prenom:"Bob", age: 30))
-
+personList.add(Person(nom: "Naruto", prenom:"Konoan", age: 23))
+personList.add(Person(nom: "Lion", prenom:"Afrique", age: 15))
+personList.add(Person(nom: "Aigle", prenom:"Noir", age: 40))
+personList.add(Person(nom: "Pierre", prenom:"Precieuse", age: 30))
 
 var gSFLine : TreeView
 var svPath: string
@@ -97,13 +100,6 @@ proc p_AddRowData(b: Button)
 
 proc p_Delete(b: Button, pSelection: TreeSelection) 
 
-#----------------------------------
-#Procedure Ajustement scrollbar
-#----------------------------------
-proc p_Ajustement (pAjust: Adjustment) =
-
-  pAjust.setValue(pAjust.getUpper())
-
 
 #----------------------------
 #Procedure Exit
@@ -112,11 +108,8 @@ proc p_quitApp(b: Button; app: Application) =
   echo "Bye"
   quit(app)
 
-#----------------------------
-#Procedure Message lollll 
-#---------------------------
-proc p_hello(b: Button; msg: string ) =
-  echo "Hello", msg
+
+
 
 #----------------------------
 #Procedure Principal
@@ -155,6 +148,10 @@ proc p_appActivate(app: Application) =
   l_Nom.setWidthChars(30)
   context = getStyleContext(l_Nom)
   context.addClass("label")
+
+
+
+
 
   e_Nom.set_name("e_Nom")
   e_Nom.setWidthChars(30)
@@ -216,7 +213,9 @@ proc p_appActivate(app: Application) =
 
   var gListStore = newListStore(Columns,  cast[pointer]( unsafeaddr h)) # cast is ugly, we should fix it in bindings.
 
-
+#--------------------------------------
+# chargement data SFLine
+#--------------------------------------
   for i in low(personList)..high(personList):
     var gIter: TreeIter
     gListStore.append(gIter) # currently we have to use setValue() as there is no varargs proc as in C original
@@ -230,10 +229,6 @@ proc p_appActivate(app: Application) =
 
 
 
-
-
-
-  # proc for treeview data
 #--------------------------------------
 # define SFLINE 
 # Model
@@ -248,6 +243,8 @@ proc p_appActivate(app: Application) =
 
   var gSelection:TreeSelection = gSFLine.getSelection()
   gSelection.setMode(SelectionMode.single)
+
+
 
 #--------------------------------------
 # define Column
@@ -322,10 +319,6 @@ proc p_appActivate(app: Application) =
 
 
 #----------------------------
-#----------------------------
-
-
-#----------------------------
 # Form Formulaire
 #----------------------------
   let  gridA = newGrid()
@@ -353,7 +346,7 @@ proc p_appActivate(app: Application) =
 # Form grid sfline
 #----------------------------
   var gridS = newGrid() 
-  gridS.setSizeRequest(860,90)
+  gridS.setSizeRequest(860,175)  # 140 /4 = 35 -> une ligne
   gridS.attach(gScrollbar, 0, 0, 1, 1)
 #----------------------------
 # Form General
@@ -370,7 +363,7 @@ proc p_appActivate(app: Application) =
 
 
 #----------------------------
-# Callback 
+# Callback button
 #----------------------------
 
   connect(b_Exit, "clicked", p_quitapp,app)
@@ -379,18 +372,15 @@ proc p_appActivate(app: Application) =
   connect(b_Add, "clicked", p_AddRowData)
   connect(b_Del, "clicked", p_Delete,gSelection)
 
-  connect(gScrollbar.getVadjustment(),"changed",p_Ajustement)
 
 
-
+  
 #----------------------------
 # Fin de création display
 #----------------------------
-
+  gSFLine.setcursor(newTreePathFromString("0"),nil,true);
   gWINAPP.add(gridForm)
   showAll(gWINAPP)
-
-
 
 #----------------------------
 # Procedrue MAIN
@@ -458,7 +448,7 @@ proc p_updateRow(pRenderer: CellRendererText;pPath: cstring; pNewText: cstring; 
       echo fmt" vint : , {vInt.getUint()} ,  path: ,{ pPath } ,  colname: , {ColName} ,  value : ,{pNewText}"
 
     else: discard
-
+  queueDraw(gSFLine)
 
 
 #----------------------------------------------------------
@@ -502,6 +492,7 @@ proc p_GetRowData(pViewTree: TreeView; pPath: TreePath; pColumn: TreeViewColumn)
     ind_Selection = true
 
   else: discard
+  queueDraw(gSFLine)
 
 #----------------------------------------------------------
 # Procedure recuperation de la ligne selectioner
@@ -529,6 +520,7 @@ proc p_SetRowData(b: Button) =
   e_Age.setText("")
   svPath = ""
   ind_Selection = false
+  queueDraw(gSFLine)
 
 #----------------------------------------------------------
 # Procedure Annul la ligne selectioner e purge le Formulaire
@@ -536,7 +528,8 @@ proc p_SetRowData(b: Button) =
 
 proc p_Cancel(b: Button,pSelection:TreeSelection) =
 
-  if ind_Selection == false  : return
+
+  #if ind_Selection == false  : return
 
   echo fmt"p_Cancel"
 
@@ -547,6 +540,7 @@ proc p_Cancel(b: Button,pSelection:TreeSelection) =
   e_Age.setText("")
   svPath = ""
   ind_Selection = false
+  queueDraw(gSFLine)
 
 #----------------------------------------------------------
 # Procedure Canceled la ligne selectioner e purge le Formulaire
@@ -577,7 +571,8 @@ proc p_AddRowData(b: Button) =
   gListStore.setValue(gIter, Color1, toStringVal("SpringGreen"))
   gListStore.setValue(gIter, Color2, toStringVal("cyan"))
 
-  queueDraw(gSFLine)  # refresh
+
+  gSFLine.setcursor(newTreePathFromString(fmt"{vNbrPerson}"),nil,true); # position last row
 
   e_NOM.setText("")
   e_PRENOM.setText("")
@@ -585,7 +580,7 @@ proc p_AddRowData(b: Button) =
   svPath = ""
 
   ind_Selection = false
-
+  queueDraw(gSFLine)
 
 #----------------------------------------------------------
 # Procedure delete 
@@ -599,9 +594,11 @@ proc p_Delete(b: Button,pSelection:TreeSelection) =
 
 
 
-  var i: int = parseInt(svPath)
-  personList.delete(i)
+  var vPerson: int = parseInt(svPath)
+  personList.delete(vPerson)
   
+  var vPos: int
+
   # fausse l'index preferer clear et recharger la liste
   pSelection.unselectAll()
   let gListStore = listStore(gSFLine.getModel())
@@ -610,7 +607,7 @@ proc p_Delete(b: Button,pSelection:TreeSelection) =
   for i in low(personList)..high(personList):
     var gIter: TreeIter
     gListStore.append(gIter) # currently we have to use setValue() as there is no varargs proc as in C original
-    
+    vPos = i
     gListStore.setValue(gIter, col_id,  toUIntVal(i + 1))
     gListStore.setValue(gIter, col_nom, toStringVal(personList[i].nom))
     gListStore.setValue(gIter, col_prenom, toStringVal(personList[i].prenom))
@@ -618,7 +615,8 @@ proc p_Delete(b: Button,pSelection:TreeSelection) =
     gListStore.setValue(gIter, Color1, toStringVal("SpringGreen"))
     gListStore.setValue(gIter, Color2, toStringVal("cyan"))
 
-  queueDraw(gSFLine)  # refresh
+  if vPerson <= vPos : 
+    gSFLine.setcursor(newTreePathFromString(fmt"{vPerson}"),nil,true); # position row
 
   e_NOM.setText("")
   e_PRENOM.setText("")
@@ -627,3 +625,4 @@ proc p_Delete(b: Button,pSelection:TreeSelection) =
 
 
   ind_Selection = false
+  queueDraw(gSFLine)

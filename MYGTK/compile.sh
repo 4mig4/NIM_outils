@@ -35,18 +35,18 @@ fi
 #-------------------------------------------------------------------
 # force full option gtk
 # debug
-# nim  c --threads --passC:-flto -d:danger  -d:forceGtk   -o:$projet_bin   $projet_src
+# nim  c --threads --passC:-flto --deadCodeElim:on -d:danger   -d:forceGtk   -o:$projet_bin   $projet_src
 # prod
-# nim  c  --verbosity:0 --hints:off --opt:size --threads --passC:-flto -d:danger  -d:forceGtk -d:release  -o:$projet_bin   $projet_src
+# nim  c  --verbosity:0 --hints:off --opt:size --threads --passC:-flto --deadCodeElim:on -d:danger  -d:forceGtk -d:release  -o:$projet_bin   $projet_src
 
 
 
 if [ "$mode" == "DEBUG" ] ; then 
-	nim  c  -f  -d:danger  -o:$projet_bin   $projet_src
+	nim  c  -f --deadCodeElim:on   -o:$projet_bin   $projet_src
 fi
 
-if [ "$mode" == "PROD" ] ; then 
-	nim  c  --verbosity:0 --hints:off  --opt:size  -d:danger -d:release -f  -o:$projet_bin   $projet_src
+if [ "$mode" == "PROD" ] ; then  
+	nim  c  --verbosity:0 --hints:off  --opt:size  --deadCodeElim:on -d:release -f  -o:$projet_bin   $projet_src
 fi
 
 #-------------------------------------------------------------------

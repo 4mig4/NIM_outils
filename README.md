@@ -58,7 +58,8 @@ ne pas confondre environnement de développeur et utilisateur 2 installations di
 
 # astuce
 1. dans vs-code  avec le plugin  runTerminalCommand
-cela vous aidera pour la translation en nim-code de GTK
+
+cela vous aidera pour la translation en nim-code de GTK dans une fenetre 
   
 "runTerminalCommand.commands": [
         {

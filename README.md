@@ -56,7 +56,9 @@ quand au base de données c'est strictement pareille
 
 ne pas confondre environnement de développeur et utilisateur 2 installations différentes 
 # module
-1.nim-decimal valide pour les traitemnt numerique industriel j'ai apporté des modifications pour la Gestion/compta/commercial....
+1. #nim-decimal 
+
+valide pour les traitemnt numerique industriel j'ai apporté des modifications pour la Gestion/compta/commercial....
 
 # astuce
 1. dans vs-code  avec le plugin  runTerminalCommand

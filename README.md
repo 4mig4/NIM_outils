@@ -56,6 +56,17 @@ quand au base de données c'est strictement pareille
 
 ne pas confondre environnement de développeur et utilisateur 2 installations différentes 
 
+# astuce
+1. dans vs-code  avec le plugin  runTerminalCommand
+cela vous aidera pour la translation en nim-code de GTK
+  
+"runTerminalCommand.commands": [
+        {
+            "command": "xfce4-terminal --title=GREP --hold --geometry 160x20 --zoom=2 -e '/home/soleil/NIM/MYGTK/grep_gtknim.sh ?*'",
+            "name": "GREP-GTK"
+        }
+    ],
+
 
 
  

@@ -4,6 +4,7 @@ faStabilo='\033[7m'
 fcRouge='\033[31m'
 fcJaune='\033[33;1m'
 fcCyan='\033[36m'
+fcGreen='\033[32m'
 
 
 #-------------------------------------------------------------------
@@ -37,7 +38,7 @@ fi
 # debug
 # nim  c --threads --passC:-flto --deadCodeElim:on -d:danger   -d:forceGtk   -o:$projet_bin   $projet_src
 # prod
-# nim  c  --verbosity:0 --hints:off --opt:size --threads --passC:-flto --deadCodeElim:on -d:danger  -d:forceGtk -d:release  -o:$projet_bin   $projet_src
+# nim  c  --verbosity:0 --hints:off --opt:size --threads --passc:-flto --deadCodeElim:on -d:danger  -d:forceGtk -d:release  -o:$projet_bin   $projet_src
 
 
 
@@ -46,7 +47,7 @@ if [ "$mode" == "DEBUG" ] ; then
 fi
 
 if [ "$mode" == "PROD" ] ; then  
-	nim  c  --verbosity:0 --hints:off  --opt:size  --deadCodeElim:on -d:release -f  -o:$projet_bin   $projet_src
+	nim  c  --verbosity:0 --hints:off  --opt:size  --passc:-flto -d:release -f -o:$projet_bin   $projet_src
 fi
 
 #-------------------------------------------------------------------
@@ -54,12 +55,13 @@ fi
 #-------------------------------------------------------------------
 
 	echo -en '\033[0;0m'	# video normal
-	
+	echo " "
 	if test -f "$projet_bin"; then
-		echo -en $faStabilo$fcCyan"BUILD $mode "$faStabilo$fcJaune"$projet_src -> $projet_bin\033[0;0m"
-		echo -en "  octet : " 
-		wc -c $projet_bin
+		echo -en $faStabilo$fcCyan"BUILD "$mode"\033[0;0m  "$fcJaune$projet_src"->\033[0;0m  "$fcGreen $projet_bin "\033[0;0m"
+		echo -en "  size : " 
+		ls -lrtsh $projet_bin | cut -d " " -f6
 	else
-		echo -en $faStabilo$fcRouge"BUILD $mode "$faStabilo$fcJaune"$projet_src -> ERROR\033[0;0m\n"
+		echo -en $faStabilo$fcCyan"BUILD "$mode"\033[0;0m  "$fcJaune$projet_src"->\033[0;0m  "$faStabilo$fcRouge"not compile\033[0;0m\n"
 	fi
+	echo " "
 exit

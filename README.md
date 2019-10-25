@@ -61,7 +61,7 @@ ne pas confondre environnement de développeur et utilisateur 2 installations di
 valide pour les traitemnt numerique industriel j'ai apporté des modifications pour la Gestion/compta/commercial....
 
 # astuce
-1.dans vs-code  avec le plugin  runTerminalCommand
+- 1.dans vs-code  avec le plugin  runTerminalCommand
 
 cela vous aidera pour la translation en nim-code de GTK dans une fenetre 
   

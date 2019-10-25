@@ -91,7 +91,7 @@ il s'appuit aussi sur gtk3 comme le premier
 
 la simplicité il ne reste que les methodes de contrôle  
 
-1.manuel.nim
+- 1.manuel.nim
 
 a été fait avec Gintro
 
@@ -100,7 +100,7 @@ aucun problème
 il comprends la sasie dans la table et dans un masque  
 
 
-2.table.nim
+- 2.table.nim
 
 a été fait avec le projet ui 
 

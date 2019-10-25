@@ -20,16 +20,16 @@ static void applyColor(GtkTreeModel *m, GtkTreeIter *iter, int modelColumn, GtkC
 }
 
 le model d'origine est pas correct et losrque l'on commence c'est une galère
-bref heureusement que j'ai commencer par le projet GINTRO
+bref heureusement que j'ai commencé par le projet GINTRO
 
 ceci etant dit il est rapide simple une fois operationel
 
 on peu entre voir plein de chose comme par exemple dans le modelSetCellValue 
-les condition et les erreur a signaler a l'utilisateur 
+les condition et les erreurs à signaler pour l'utilisateur 
 
-vous devez vous posez des question pour SFLine il faut le penser comme un sous fichier ligne sur le quel la table roule
+vous devez vous posez des questions pour SFLine il faut le penser comme un sous fichier ligne sur le quel la table roule
 
-biensur il faudrait ajouter des button dans l'application  pour valider et mettre ajour ect.... ou dans la ligne ...  
+biensur il faudrait ajouter des buttons dans l'application  pour valider et mettre ajour ect.... ou dans la ligne ...  
 
 ]#
 

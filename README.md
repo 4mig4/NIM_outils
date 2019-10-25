@@ -75,5 +75,28 @@ cela vous aidera pour la translation en nim-code de GTK dans une fenetre
 
 
  
+###Programme
 
+j'avais besoin de me rendre compte pour savoir comment et le temps que cela prends pour developper 
+le 1° c'est une question de translation pour retrouver les ordres
+après ce n'est que de la logique pour les methodes de contrôle  
+il offre une grande palette de fonction qui permette de titiller finement  
+
+le 2° c'est l'apprentissage d'ordre
+il s'appuit aussi sur gtk3 comme le premier 
+la simplicité il ne reste que les methodes de contrôle  
+
+1.) manuel.nim
+
+a été fait avec Gintro 
+aucun problème 
+il comprends la sasie dans la table et dans un masque  
+
+
+2.) table.nim
+
+a été fait avec le projet ui 
+je n'ai pas repris les exemple de la gallery il fonctionne et est assé simple
+
+il y a des avertissements dans le source verifiez si les corrections on été faites sinon appliquez les recommendations.... 
 

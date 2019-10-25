@@ -75,7 +75,7 @@ cela vous aidera pour la translation en nim-code de GTK dans une fenetre
 
 
  
-#Programme
+# Programme
 
 j'avais besoin de me rendre compte pour savoir comment et le temps que cela prends pour developper
 

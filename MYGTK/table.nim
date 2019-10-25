@@ -4,7 +4,7 @@ bonjour :
 ce model fonctionne sans bug pour ui.nim
 
 il y a juste un beug dans 
-ma correction ce module ne sert que pour les tables   taable.c
+ma correction ce module ne sert que pour les tables   table.c
 static void applyColor(GtkTreeModel *m, GtkTreeIter *iter, int modelColumn, GtkCellRenderer *r, const char *prop, const char *propSet)
 {
 	GValue value = G_VALUE_INIT;

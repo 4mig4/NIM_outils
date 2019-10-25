@@ -56,7 +56,7 @@ quand au base de données c'est strictement pareille
 
 ne pas confondre environnement de développeur et utilisateur 2 installations différentes 
 # module
--1.nim-decimal 
+- 1.nim-decimal 
 
 valide pour les traitemnt numerique industriel j'ai apporté des modifications pour la Gestion/compta/commercial....
 
@@ -93,6 +93,8 @@ la simplicité il ne reste que les methodes de contrôle
 
 - 1.manuel.nim
 
+https://github.com/StefanSalewski/gintro
+
 a été fait avec Gintro
 
 aucun problème 
@@ -101,6 +103,8 @@ il comprends la sasie dans la table et dans un masque
 
 
 - 2.table.nim
+
+https://github.com/nim-lang/ui
 
 a été fait avec le projet ui 
 

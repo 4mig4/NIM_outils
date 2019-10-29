@@ -112,3 +112,11 @@ je n'ai pas repris les exemple de la gallery il fonctionne et est assé simple
 
 il y a des avertissements dans le source verifiez si les corrections on été faites sinon appliquez les recommendations.... 
 
+- 3.biggtk.nim
+
+le choix est gintro gtk 
+il devient professionel avec tables de descisions 
+à terme il devrait recouvrir la majeur parti des problèmes rencontrer pour la gestion interactive.
+
+
+

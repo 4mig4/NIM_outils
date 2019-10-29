@@ -118,5 +118,7 @@ le choix est gintro gtk
 il devient professionel avec tables de descisions 
 à terme il devrait recouvrir la majeur parti des problèmes rencontrer pour la gestion interactive.
 
+ainsi que les problèmes les plus courant avec nim , regex , les string les tables .... et les decimal..... 
+
 
 

@@ -36,20 +36,23 @@ fi
 #-------------------------------------------------------------------
 # force full option gtk
 # debug
-# nim  c --threads --passC:-flto --deadCodeElim:on -d:danger   -d:forceGtk   -o:$projet_bin   $projet_src
+# nim  c --threads --passc:-flto --deadCodeElim:on -d:danger   -d:forceGtk   -o:$projet_bin   $projet_src
 # prod
 # nim  c  --verbosity:0 --hints:off --opt:size --threads --passc:-flto --deadCodeElim:on -d:danger  -d:forceGtk -d:release  -o:$projet_bin   $projet_src
-
+# --passL:-no-pie  bin executable   par defaut -pie compilateur gcc and nim 
 
 
 if [ "$mode" == "DEBUG" ] ; then 
-	nim  c  -f --deadCodeElim:on   -o:$projet_bin   $projet_src
+	nim  c  -f --deadCodeElim:on  --app:GUI --passL:-no-pie -o:$projet_bin   $projet_src
 fi
 
 if [ "$mode" == "PROD" ] ; then  
-	nim  c  --verbosity:0 --hints:off  --opt:size  --passc:-flto -d:release -f -o:$projet_bin   $projet_src
+	nim  c  --verbosity:0 --hints:off  --deadCodeElim:on --app:GUI  --passc:-flto -d:release -f -o:$projet_bin   $projet_src
 fi
 
+if [ "$mode" == "TEST" ] ; then  
+	nim  c -f -o:$projet_bin   $projet_src
+fi
 #-------------------------------------------------------------------
 # resultat
 #-------------------------------------------------------------------
@@ -64,4 +67,13 @@ fi
 		echo -en $faStabilo$fcCyan"BUILD "$mode"\033[0;0m  "$fcJaune$projet_src"->\033[0;0m  "$faStabilo$fcRouge"not compile\033[0;0m\n"
 	fi
 	echo " "
+
+	if [ "$mode" == "TEST" ] ; then
+		if test -f "$projet_bin"; then  
+			echo "..TEST.. "
+			echo " "
+			./$projet_bin
+			echo " "
+		fi
+fi
 exit

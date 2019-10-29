@@ -11,7 +11,7 @@ import strutils
 import strformat
 import std/[re]
 
-include "./func_GTK.inc"
+include "./proc_GTK.inc"
 
 type Person = object
   nom: string

@@ -14,12 +14,12 @@
 #
 #-----------------------------------------
 import gintro/[glib, gobject, gtk , gdk]
-import gintro/gio 
-
+import gintro/gio except ListStore
+ 
 
 import strutils
 import strformat
-from strutils import Digits, parseInt
+
 
 
 const 
@@ -47,6 +47,7 @@ personList.add(Person(nom: "Aigle", prenom:"Noir", age: 40))
 personList.add(Person(nom: "Pierre", prenom:"Precieuse", age: 30))
 
 var gSFLine : TreeView
+var gListStore : ListStore
 var svPath: string
 var ind_Selection : bool = false
 
@@ -74,15 +75,6 @@ proc toBoolVal(b: bool): Value =
   discard init(result, gtype)
   setBoolean(result, b)
 
-
-# we need the following two procs for now -- later we will not use that ugly cast...
-proc typeTest(o: gobject.Object; s: string): bool =
-  let gt = g_type_from_name(s)
-  return g_type_check_instance_is_a(cast[ptr TypeInstance00](o.impl), gt).toBool
-
-proc listStore(o: gobject.Object): gtk.ListStore =
-  assert(typeTest(o, "GtkListStore"))
-  cast[gtk.ListStore](o)
 
 #----------------------------------
 # declaration Procedure UPDATE SFL
@@ -138,9 +130,6 @@ proc p_appActivate(app: Application) =
   var  context: StyleContext
 
 
-  let  gWINAPP = newApplicationWindow(app)
-  gWINAPP.title = "TEST-Manuel"
-  gWINAPP.setBorderWidth(5)
 
 #----------------------------
 # field
@@ -211,7 +200,7 @@ proc p_appActivate(app: Application) =
 #--------------------------------------
   var h = [typeFromName("guint"), typeFromName("gchararray"), typeFromName("gchararray"),typeFromName("guint"), typeFromName("gchararray"),typeFromName("gchararray")]
 
-  var gListStore = newListStore(Columns,  cast[pointer]( unsafeaddr h)) # cast is ugly, we should fix it in bindings.
+  gListStore = newListStore(Columns,  cast[pointer]( unsafeaddr h)) # cast is ugly, we should fix it in bindings.
 
 #--------------------------------------
 # chargement data SFLine
@@ -224,9 +213,12 @@ proc p_appActivate(app: Application) =
     gListStore.setValue(gIter, col_nom, toStringVal(personList[i].nom))
     gListStore.setValue(gIter, col_prenom, toStringVal(personList[i].prenom))
     gListStore.setValue(gIter, col_age,  toUIntVal(personList[i].age))
-    gListStore.setValue(gIter, Color1, toStringVal("SpringGreen"))
-    gListStore.setValue(gIter, Color2, toStringVal("cyan"))
+    gListStore.setValue(gIter, Color1, toStringVal("DarkSeaGreen"))
 
+    if ( i mod 2  == 0):
+      gListStore.setValue(gIter, Color2, toStringVal("Azure"))
+    else :
+      gListStore.setValue(gIter, Color2, toStringVal("Beige"))
 
 
 #--------------------------------------
@@ -239,7 +231,7 @@ proc p_appActivate(app: Application) =
   gSFLine.setVexpand
   gSFLine.setProperty("activate-on-single-click", toBoolVal(true))
   context = getStyleContext(gSFLine)
-  context.addClass("treview")
+  context.addClass("treeview")
 
   var gSelection:TreeSelection = gSFLine.getSelection()
   gSelection.setMode(SelectionMode.single)
@@ -276,8 +268,6 @@ proc p_appActivate(app: Application) =
 # calcul width  police monospace 20 font-size 2mm  setFixedWidth=((nombr_car +1) * 12)
 # ex: 3car + 1 tampon * 12 = 48 
 #-------------------------
-
-
 
   coln_1.setTitle("ID")
   coln_1.packStart(renderer_1, true)
@@ -358,8 +348,6 @@ proc p_appActivate(app: Application) =
   gridForm.setRowSpacing(15)
   gridForm.setMarginLeft(15);
   gridForm.setMarginRight(15);
-  context = getStyleContext(gridForm)
-  context.addClass("grid")
 
 
 #----------------------------
@@ -374,10 +362,15 @@ proc p_appActivate(app: Application) =
 
 
 
+
   
 #----------------------------
 # Fin de création display
 #----------------------------
+  let  gWINAPP = newApplicationWindow(app)
+  gWINAPP.title = "TEST-Manuel"
+  gWINAPP.setBorderWidth(5)
+  
   gSFLine.setcursor(newTreePathFromString("0"),nil,true);
   gWINAPP.add(gridForm)
   showAll(gWINAPP)
@@ -407,8 +400,7 @@ proc p_updateRow(pRenderer: CellRendererText;pPath: cstring; pNewText: cstring; 
   #recuperation le rang de la cellule
   let gPathTree = newTreePathFromString(pPath)
 
-  #recuperation listStore et l'iterator
-  let gListStore = listStore(gSFLine.getModel())
+  #recuperation listStore -> l'iterator
   var gIter: TreeIter
   discard gListStore.getIter(gIter, gPathTree)
 
@@ -417,16 +409,14 @@ proc p_updateRow(pRenderer: CellRendererText;pPath: cstring; pNewText: cstring; 
   var vStr: Value
   var vInt: Value
 
-  #traitement de recuperation des données  à partir du model gListStore
-  #update de la table personList
-  
-  let ColName : string = pColumn.getTitle()
+  #traitement de recuperation des données
 
+  let ColName : string = pColumn.getTitle()
   let Str : string = $pPath
   let Rown : int = parseInt(Str)
 
-
   case ColName
+
     of "NOM" :
       gListStore.getValue(gIter, col_nom,vStr)
       personList[Rown].nom = fmt"{pNewText}"
@@ -469,7 +459,6 @@ proc p_GetRowData(pViewTree: TreeView; pPath: TreePath; pColumn: TreeViewColumn)
   case ColName
   of "ID" :
 
-    let gListStore = listStore(gSFLine.getModel())
     var gIter : TreeIter
     discard gListStore.getIter(gIter, pPath)
 
@@ -505,7 +494,7 @@ proc p_SetRowData(b: Button) =
   echo fmt"p_SetRowData           path: ,{ svPath } "
 
   let gPath = newTreePathFromString(svPath)
-  let gListStore = listStore(gSFLine.getModel())
+  
   var gIter : TreeIter
   discard gListStore.getIter(gIter, gPath)
 
@@ -528,8 +517,6 @@ proc p_SetRowData(b: Button) =
 
 proc p_Cancel(b: Button,pSelection:TreeSelection) =
 
-
-  #if ind_Selection == false  : return
 
   echo fmt"p_Cancel"
 
@@ -560,7 +547,6 @@ proc p_AddRowData(b: Button) =
   for i in low(personList)..high(personList): 
     vNbrPerson = i
 
-  let gListStore = listStore(gSFLine.getModel())
   var gIter: TreeIter
   gListStore.append(gIter)
   echo fmt"p_AddRowData   {vNbrPerson }"
@@ -599,9 +585,9 @@ proc p_Delete(b: Button,pSelection:TreeSelection) =
   
   var vPos: int
 
-  # fausse l'index preferer clear et recharger la liste
+  # fausse l'index clear et recharger la liste
   pSelection.unselectAll()
-  let gListStore = listStore(gSFLine.getModel())
+
   clear(gListStore)
 
   for i in low(personList)..high(personList):

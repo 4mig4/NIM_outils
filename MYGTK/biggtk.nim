@@ -282,8 +282,7 @@ proc p_appActivate(app: Application) =
   gridForm.setRowSpacing(15)
   gridForm.setMarginLeft(15);
   gridForm.setMarginRight(15);
-  context = getStyleContext(gridForm)
-  context.addClass("grid")
+
 
 
 #----------------------------
@@ -300,7 +299,7 @@ proc p_appActivate(app: Application) =
 # Fin de création display
 #----------------------------
   let  gWINAPP = newApplicationWindow(app)
-  gWINAPP.title = "TEST-Manuel"
+  gWINAPP.title = "TEST-BIG_GTK"
   gWINAPP.setBorderWidth(5)
   gWINAPP.add(gridForm)
 

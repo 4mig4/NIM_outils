@@ -46,12 +46,11 @@ proc mEntry( sName: string; ncar: int; style: bool = true; sText: string = ""): 
   return x
 
 proc mButton(sName: string; sText: string; style: bool = true ): Button =
-  var x = newButton(sName)
-  x.set_name(sText)
-  if style :
-    var  contextx: StyleContext
-    contextx = getStyleContext(x)
-    contextx.addClass("button")
+  var x = newButton(sText)
+  x.set_name(sName)
+  var  contextx: StyleContext
+  contextx = getStyleContext(x)
+  contextx.addClass("button")
   return x
 
 proc mTreeVwColEdit(sName: string ; col_num: int ; nbrcar: int ; col_color : int ): (TreeViewColumn , CellRendererText) =

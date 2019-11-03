@@ -99,7 +99,7 @@ a été fait avec Gintro
 
 aucun problème 
 
-il comprends la sasie dans la table et dans un masque  
+il comprends la saisie dans la table et dans un masque  
 
 
 - 2.table.nim
@@ -108,14 +108,14 @@ https://github.com/nim-lang/ui
 
 a été fait avec le projet ui 
 
-je n'ai pas repris les exemple de la gallery il fonctionne et est assé simple
+je n'ai pas repris les exemples de la gallery ils fonctionnen et est assé simple
 
 il y a des avertissements dans le source verifiez si les corrections on été faites sinon appliquez les recommendations.... 
 
 - 3.biggtk.nim
 
 le choix est gintro gtk 
-il devient professionel avec tables de descisions 
+il devient professionel avec tables de déscisions 
 à terme il devrait recouvrir la majeur parti des problèmes rencontrer pour la gestion interactive.
 
 ainsi que les problèmes les plus courant avec nim , regex , les string les tables .... et les decimal..... 

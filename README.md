@@ -1,5 +1,7 @@
 # NIM_etudes
-etudes du language Nim-lang avec outils
+etudes du language Nim-lang avec outils  
+  
+fait avec GINTRO 0.8.0
 
 Bonjour 
 

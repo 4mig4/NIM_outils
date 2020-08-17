@@ -6,27 +6,28 @@
 import gintro/[glib, gobject, gtk , gdk]
 import gintro/gio except ListStore
 
-
-import strutils
+from strutils import toUpper , toLower
+from strutils import Digits, parseInt
+from strutils import Digits, parseFloat
 import strformat
 import std/[re]
-
-include "./proc_GTK.inc"
 
 type Person = object
   nom: string
   prenom: string
   age: int
+  annuel: float
+  mensuel: float
 
 var personList = newSeq[Person]()
-personList.add(Person(nom: "Koch", prenom:"karl", age: 23))
-personList.add(Person(nom: "Pan", prenom:"Peter", age: 12))
-personList.add(Person(nom: "Rouge", prenom:"JP", age: 68))
-personList.add(Person(nom: "Moranne", prenom:"Bob", age: 30))
-personList.add(Person(nom: "Naruto", prenom:"Konoan", age: 23))
-personList.add(Person(nom: "Lion", prenom:"Afrique", age: 15))
-personList.add(Person(nom: "Aigle", prenom:"Noir", age: 40))
-personList.add(Person(nom: "Pierre", prenom:"Precieuse", age: 30))
+personList.add(Person(nom: "Koch", prenom:"karl", age: 23, annuel: 0, mensuel : 0))
+personList.add(Person(nom: "Pan", prenom:"Peter", age: 12, annuel: 0 , mensuel : 0))
+personList.add(Person(nom: "Rouge", prenom:"JP", age: 68, annuel: 0 , mensuel : 0))
+personList.add(Person(nom: "Moranne", prenom:"Bob", age: 30, annuel: 0 , mensuel : 0))
+personList.add(Person(nom: "Naruto", prenom:"Konoan", age: 23, annuel: 0 , mensuel : 0))
+personList.add(Person(nom: "Lion", prenom:"Afrique", age: 15, annuel: 0 , mensuel : 0))
+personList.add(Person(nom: "Aigle", prenom:"Noir", age: 40, annuel: 0 , mensuel : 0))
+personList.add(Person(nom: "Pierre", prenom:"Precieuse", age: 30, annuel: 0 , mensuel : 0))
 
 var e_Nom : Entry
 var e_Prenom : Entry
@@ -37,15 +38,17 @@ const
   col_nom = 1
   col_prenom = 2
   col_age = 3
-  color_index = 4
-  color_data = 5
-  col_nbr = 6
+  col_annuel = 4
+  col_mensuel = 5
+  color_index = 6
+  color_data = 7
+  col_nbr = 8
 
 var gSFLine : TreeView
 var gListStore : ListStore
 var svPath: string
 var ind_Selection : bool = false
-
+let gLinesV: TreeViewGridLines  = TreeViewGridLines.vertical
 
 
 #-------------------------------------------------------------------------
@@ -62,7 +65,7 @@ type oScreen = object
   typf : bool # float
   rgs  : string
   force: bool # true obligatoire
-  tst : bool
+  tsti : bool
   min : int
   max : int
   tstf : bool
@@ -74,19 +77,32 @@ type oScreen = object
 
 var scrList = newSeq[oScreen]()
 scrList.add(oScreen(id: col_id, name:"ID", ncar: 3 , typs : false, typi : true, typd : false, typf : false ,
- rgs : "" , force: false , tst: false , min: 0 , max: 0 , tstf: false , minf :0.0 , maxf :0.0 ))  # no contrôle
+                      rgs : "" ,
+                        force: false , tsti: false , min: 0 , max: 0 , tstf: false , minf :0.0 , maxf :0.5 ))  # no contrôle
 
 
 scrList.add(oScreen(id: col_nom, name:"NOM", ncar: 30, typs : true, typi : false, typd : false, typf : false ,
- rgs: "[A-ZÀÂÇÉÈÊËÏÎÔŒÙÛÜŸŶ \\-]", force: true , tst: false , min: 0 , max: 0 , tstf: false , minf :0.0 , maxf :0.0 ))
+                      rgs: "^[A-ZÀÂÇÉÈÊËÏÎÔŒÙÛÜŸŶ \\-]*$",
+                        force: true , tsti: false , min: 0 , max: 0 , tstf: false , minf :0 , maxf :0 ))
 
 scrList.add(oScreen(id: col_prenom, name:"PRENOM", ncar: 30, typs : true, typi : false, typd : false, typf : false ,
- rgs: "[A-Za-zäâÀÂâçÇéÉèÈêÊëËïÏîÎöÖôÔœŒùÙüÛûÜïŸîŶ \\-]", force: true , tst: false , min: 0 , max: 0 , tstf: false , minf :0.0 , maxf :0.0 ))
+                      rgs: "^[A-Za-zäâÀÂâçÇéÉèÈêÊëËïÏîÎöÖôÔœŒùÙüÛûÜïŸîŶ \\-]*$",
+                        force: true , tsti: false , min: 0 , max: 0 , tstf: false , minf :0 , maxf :0 ))
 
 scrList.add(oScreen(id: col_age, name:"AGE", ncar: 3, typs : false, typi : true, typd : false, typf : false,
- rgs : "\\d{0,%d}", force: true , tst: false , min: 0 , max: 0 , tstf: true , minf :0.0 , maxf :120.0 ))
+                      rgs :"^\\d{1,3}$",
+                        force: true , tsti: true, min: 0 , max: 120 , tstf: false , minf :0 , maxf :0 ))
 
+scrList.add(oScreen(id: col_annuel, name:"ANNUEL", ncar: 12, typs : false, typi : false, typd : false, typf : true,
+                      rgs :"^\\d{1,9}(\\.(?=\\d)\\d){0,2}$",
+                        force: true , tsti: false, min: 0 , max: 0 , tstf: true , minf :0.00 , maxf :999999999.99 ))
 
+scrList.add(oScreen(id: col_mensuel, name:"MENSUEL", ncar: 12, typs : false, typi : false, typd : false, typf : true,
+                        rgs :"",
+                          force: false , tsti: false, min: 0 , max: 0 , tstf: false , minf :0 , maxf :0 ))
+
+#rgs : ex: "^\\d{0,3}$"   integer 
+#rgs : ex: "^\\d{1,3}(\\.(?=\\d)\\d){0,2}$"  decimales /float
 
 #----------------------------
 #Procedure Exit
@@ -96,11 +112,38 @@ proc p_quitApp(b: Button; app: Application) =
   quit(app)
 
 
-#----------------------------------
 # declaration Procedure 
-#----------------------------------
 
-proc p_UpdateRow(pRenderer: CellRendererText;pPath: cstring; pNewText: cstring; pColumn :TreeViewColumn )
+#----------------------------
+# Fonction interne
+#----------------------------
+
+proc toStringVal(s: string): Value
+
+proc toUIntVal(i: int): Value
+
+proc toBoolVal(b: bool): Value 
+
+proc toFloatVal(f: float): Value 
+
+#----------------------------
+# Fonction GTK
+#----------------------------
+
+proc mLabel(sText: string; ncar: int; style: bool = true ): Label
+
+proc mEntry( sName: string; ncar: int; style: bool = true; sText: string = "") : Entry
+
+proc mButton(sName: string; sText: string; style: bool = true ): Button
+
+proc mTreeViewColEdit(sName: string ; col_num: int ; nbrcar: int ; col_color : int ; col_alignment: cfloat = 0.0 ): (TreeViewColumn , CellRendererText)
+
+proc mTreeViewColRead(sName: string; col_num: int ; nbrcar: int ;  col_color: int ; col_alignment: cfloat = 0.0 ): TreeViewColumn
+
+
+proc p_CellDataErr(pColumn :TreeViewColumn; pVal: string): bool
+
+proc p_UpdRowData(pRenderer: CellRendererText; pPath: string; pNewText: string; pColumn :TreeViewColumn )
 
 proc p_GetRowData(pViewTree: TreeView; pPath: TreePath; pColumn: TreeViewColumn)
 
@@ -110,38 +153,56 @@ proc p_Cancel(b: Button; pSelection: TreeSelection)
 
 proc p_AddRowData(b: Button)
 
-proc p_Delete(b: Button, pSelection: TreeSelection)
+proc p_DltRowData(b: Button, pSelection: TreeSelection)
 
 #proc pcell_data_function(column: TreeViewColumn; cell: CellRenderer;  data: pointer)
 
 
-proc p_CellDataErr(pColumn :TreeViewColumn;pNewText: cstring;): bool=
 
-  var sVal:string = fmt"{pNewText}"
 
-  let ColName: string = pColumn.getTitle()
 
-  var scr : oScreen
+proc p_EntryDataErr(pEntry : Entry ;pVal: string;): bool=
 
+
+  let sName: string = pEntry.getName()
+
+  var u : int
   for i in low(scrList)..high(scrList):
-    if scrList[i].name == ColName :
-      scr = scrList[i]
+    if scrList[i].name == sName :
+      u=i
       break
 
-  echo fmt" p_CellDataErr  vstr:, {sVal}  ,  colname: , {ColName} ,  lens Val  {scr.ncar} : ,{sVal.len}   errror"
+  echo fmt" p_EntryDataErr  vstr:, {pVal}  ,  name: , {sName} ,  lens Val  {scrList[u].ncar} : {pVal.len}   u {u}  errror"
   
   # controle len maxi 
-  if sVal.len > scr.ncar :
+  if pVal.len > scrList[u].ncar :
     return true
 
   # controle saisie obligatoire
-  if sVal.len ==  0 and scr.force :
+  if pVal.len ==  0 and scrList[u].force :
     return true
+  echo "ok2"
+  echo fmt"regex   {scrList[u].rgs}"
 
+  echo fmt"match(pVal ,re(scrList[u].rgs) {match(pVal ,re(scrList[u].rgs))}"
   #controle keyboard 
-  let rgx = re(fmt"{scr.rgs}")
-  if match(sVal ,rgx) :
+  if false == match(pVal ,re(scrList[u].rgs)) :
     return true
+  echo "ok3"
+
+  if scrList[u].tsti :
+    if scrList[u].min >  parseInt(pVal) or scrList[u].max <  parseInt(pVal) :
+      echo "oups"
+      return true
+
+  echo fmt"ok4 "
+
+  if scrList[u].tstf :
+    if scrList[u].minf >  parseFloat(pVal) or scrList[u].maxf <  parseFloat(pVal) :
+      return true
+
+  echo "ok5"
+
 
   return false
 
@@ -155,11 +216,11 @@ proc p_appActivate(app: Application) =
 
   let l_Nom = mLabel("Nom",30)
   let l_Prenom = mLabel("Prénom",30)
-  let l_Age = mLabel("Age",3)
+  let l_Age = mLabel("Age",6)
 
-  e_Nom = mEntry("e_Nom",30)
-  e_Prenom = mEntry("e_Prenom",30)
-  e_Age = mEntry("e_Age",3)
+  e_Nom = mEntry("NOM",30)
+  e_Prenom = mEntry("PRENOM",30)
+  e_Age = mEntry("AGE",6)
 
   let  b_Exit = mButton("b_Exit","Exit")
   let  b_Update = mButton("b_Update","UPDATE")
@@ -197,7 +258,8 @@ proc p_appActivate(app: Application) =
 # define SFLINE 
 # liststore or tabeau display ;)
 #--------------------------------------
-  var h = [typeFromName("guint"), typeFromName("gchararray"), typeFromName("gchararray"),typeFromName("guint"), typeFromName("gchararray"),typeFromName("gchararray")]
+  var h = [typeFromName("guint"), typeFromName("gchararray"), typeFromName("gchararray"),typeFromName("gchararray"),
+  typeFromName("gchararray"),typeFromName("gchararray"),typeFromName("gchararray"),typeFromName("gchararray")]
   
   gListStore = newListStore(col_nbr,  cast[pointer]( unsafeaddr h)) # cast is ugly, we should fix it in bindings.
 
@@ -208,10 +270,12 @@ proc p_appActivate(app: Application) =
   for i in low(personList)..high(personList):
     gListStore.append(gIter) # currently we have to use setValue() as there is no varargs proc as in C original
     
-    gListStore.setValue(gIter, col_id,  toUIntVal(i + 1))
-    gListStore.setValue(gIter, col_nom, toStringVal(personList[i].nom))
-    gListStore.setValue(gIter, col_prenom, toStringVal(personList[i].prenom))
-    gListStore.setValue(gIter, col_age,  toUIntVal(personList[i].age))
+    gListStore.setValue(gIter, col_id,      toUIntVal(i + 1))
+    gListStore.setValue(gIter, col_nom,     toStringVal(personList[i].nom))
+    gListStore.setValue(gIter, col_prenom,  toStringVal(personList[i].prenom))
+    gListStore.setValue(gIter, col_age,     toStringVal(fmt"{personList[i].age}"))
+    gListStore.setValue(gIter, col_annuel,  toStringVal(fmt"{personList[i].annuel:9.2f}"))
+    gListStore.setValue(gIter, col_mensuel, toStringVal(fmt"{personList[i].mensuel:9.2f}"))
     gListStore.setValue(gIter, color_index, toStringVal("PaleGoldenRod"))
 
     if ( i mod 2  == 0):
@@ -222,12 +286,14 @@ proc p_appActivate(app: Application) =
 # define SFLINE 
 # Model
 #--------------------------------------
-
+ 
   gSFLine  = newTreeViewWithModel(gListStore)
   gSFLine.setHexpand
   gSFLine.setVexpand
   gSFLine.setProperty("activate-on-single-click", toBoolVal(true))
-  
+
+  setGridLines(gSFLine,gLinesV)
+
   var context = getStyleContext(gSFLine)
   context.addClass("treeview")
   
@@ -239,21 +305,28 @@ proc p_appActivate(app: Application) =
 # define CellRenderer
 # calback row.... 
 #--------------------------------------
-  let coln_1 = mTreeVwColRead("ID", col_id , 3, color_index)
+  let coln_1 = mTreeViewColRead("ID", col_id , 2, color_index,0.5)
   discard gSFLine.appendColumn(coln_1)
   
-  let (coln_2 , renderer_2) = mTreeVwColEdit("NOM" , col_nom, 30  , color_data )
-  connect(renderer_2, "edited", p_UpdateRow , coln_2)
+  let (coln_2 , renderer_2) = mTreeViewColEdit("NOM" , col_nom, 30  , color_data)
+  connect(renderer_2, "edited", p_UpdRowData , coln_2)
   #setCellDataFunc(coln_2,renderer_2,f_CellDataFunction,nil,nil)
   discard gSFLine.appendColumn(coln_2)
   
-  let (coln_3, renderer_3)  = mTreeVwColEdit("PRENOM" , col_prenom , 30 , color_data)
-  connect(renderer_3, "edited", p_UpdateRow , coln_3)
+  let (coln_3, renderer_3)  = mTreeViewColEdit("PRENOM" , col_prenom , 30 , color_data )
+  connect(renderer_3, "edited", p_UpdRowData , coln_3)
   discard gSFLine.appendColumn(coln_3)
   
-  let (coln_4, renderer_4)  = mTreeVwColEdit("AGE" , col_age , 3 , color_data)
-  connect(renderer_4, "edited", p_UpdateRow , coln_4)
+  let (coln_4, renderer_4)  = mTreeViewColEdit("AGE" , col_age , 3 , color_data, 1.0)
+  connect(renderer_4, "edited", p_UpdRowData , coln_4)
   discard gSFLine.appendColumn(coln_4)
+
+  let (coln_5, renderer_5)  = mTreeViewColEdit("ANNUEL" , col_annuel , 12 , color_data,1.0)
+  connect(renderer_5, "edited", p_UpdRowData , coln_5)
+  discard gSFLine.appendColumn(coln_5)
+
+  let coln_6 = mTreeViewColRead("MENSUEL" , col_mensuel , 12 , color_data,1.0)
+  discard gSFLine.appendColumn(coln_6)
   
   connect(gSFLine, "row-activated", p_GetRowData)
 
@@ -268,7 +341,7 @@ proc p_appActivate(app: Application) =
 # Form grid sfline
 #----------------------------
   var gridS = newGrid() 
-  gridS.setSizeRequest(816,175)  # 140 /4 = 35 -> une ligne
+  gridS.setSizeRequest(1092,175)  # 175 /5 = 35 -> une ligne
   gridS.attach(gScrollbar, 0, 0, 1, 1)
 
 
@@ -293,7 +366,7 @@ proc p_appActivate(app: Application) =
   connect(b_Update, "clicked", p_SetRowData)
   connect(b_Cancel, "clicked", p_Cancel,gSelection)
   connect(b_Add, "clicked", p_AddRowData)
-  connect(b_Del, "clicked", p_Delete,gSelection)
+  connect(b_Del, "clicked", p_DltRowData,gSelection)
 
 #----------------------------
 # Fin de création display
@@ -304,6 +377,7 @@ proc p_appActivate(app: Application) =
   gWINAPP.add(gridForm)
 
   showAll(gWINAPP)
+
 #----------------------------
 # Procedrue MAIN
 #----------------------------
@@ -317,10 +391,48 @@ main()
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
+
+#----------------------------------------------------------
+# Procedure de contrôle saisie SFLine
+#----------------------------------------------------------
+
+proc p_CellDataErr(pColumn :TreeViewColumn; pVal: string): bool=
+
+  let ColName: string = pColumn.getTitle()
+
+  var u : int
+  for i in low(scrList)..high(scrList):
+    if scrList[i].name == ColName :
+      u=i
+      break
+
+  # controle len maxi 
+  if pVal.len > scrList[u].ncar :
+    return true
+
+  # controle saisie obligatoire
+  if pVal.len ==  0 and scrList[u].force :
+    return true
+
+  #controle keyboard 
+  if false == match(pVal ,re(scrList[u].rgs)) :
+    return true
+
+  if scrList[u].tsti :
+    if scrList[u].min >  parseInt(pVal) or scrList[u].max <  parseInt(pVal) :
+      return true
+
+  if scrList[u].tstf :
+    if scrList[u].minf >  parseFloat(pVal) or scrList[u].maxf <  parseFloat(pVal) :
+      return true
+
+  return false
+
+
 #----------------------------------------------------------
 # Procedure de traitement des données saisie avec SFLine
 #----------------------------------------------------------
-proc p_updateRow(pRenderer: CellRendererText;pPath: cstring; pNewText: cstring; pColumn :TreeViewColumn ) =
+proc p_UpdRowData(pRenderer: CellRendererText;pPath: string; pNewText: string; pColumn :TreeViewColumn ) =
 
   ## update / mise à jour de la gine uniquement par en direct SFLine or Formulaire 
 
@@ -333,42 +445,40 @@ proc p_updateRow(pRenderer: CellRendererText;pPath: cstring; pNewText: cstring; 
   var gIter: TreeIter
   discard gListStore.getIter(gIter, gPathTree)
 
-  #receptacle de donnés string int .....
-
-  var vStr: Value
-  var vInt: Value
-
   #traitement de recuperation des données  à partir du model gListStore
   #update de la table personList
   
   let ColName : string = pColumn.getTitle()
 
   let Str : string = $pPath
+
   let Rown : int = parseInt(Str)
 
+  var pVal:string = fmt"{pNewText}"
 
   case ColName
     of "NOM" :
-      if p_CellDataErr(pColumn,pNewText):
+      pVal = toUpper(pVal)
+      if p_CellDataErr(pColumn,pVal):
         gListStore.setValue(gIter, col_nom,toStringVal(fmt"{personList[Rown].nom}"))
       else:
-        personList[Rown].nom = fmt"{pNewText}"
-        gListStore.setValue(gIter, col_nom,toStringVal(fmt"{pNewText}"))
+        personList[Rown].nom = fmt"{pVal}"
+        gListStore.setValue(gIter, col_nom,toStringVal(pVal))
 
     of "PRENOM" :
-      if p_CellDataErr(pColumn,pNewText):
+      if p_CellDataErr(pColumn,pVal):
         gListStore.setValue(gIter, col_prenom,toStringVal(fmt"{personList[Rown].prenom}"))
       else:
-        personList[Rown].prenom = fmt"{pNewText}"
-        gListStore.setValue(gIter, col_nom,toStringVal(fmt"{pNewText}"))
+        personList[Rown].prenom = fmt"{pVal}"
+        gListStore.setValue(gIter, col_prenom,toStringVal(pVal))
 
     of "AGE" :
       
-      if p_CellDataErr(pColumn,pNewText):
-        gListStore.setValue(gIter, col_age,toUIntVal(personList[Rown].age))
+      if p_CellDataErr(pColumn,pVal):
+        gListStore.setValue(gIter, col_age,toStringVal(fmt"{personList[Rown].age}"))
       else:
-        personList[Rown].age = parseInt(fmt"{pNewText}")
-        gListStore.setValue(gIter, col_age, toUIntVal(parseInt(fmt"{pNewText}")))
+        personList[Rown].age = parseInt(pVal)
+        gListStore.setValue(gIter, col_age, toStringVal(pVal))
 
 
     else: discard
@@ -409,7 +519,7 @@ proc p_GetRowData(pViewTree: TreeView; pPath: TreePath; pColumn: TreeViewColumn)
     e_PRENOM.setText(vPrenom.getString())
 
     gListStore.getValue(gIter, col_age, vAge)
-    e_AGE.setText(fmt"{vAge.getUint()}")
+    e_AGE.setText(vAge.getString())
 
     svPath = toString(pPath)
     ind_Selection = true
@@ -432,11 +542,24 @@ proc p_SetRowData(b: Button) =
   var gIter : TreeIter
   discard gListStore.getIter(gIter, gPath)
 
-  gListStore.setValue(gIter, col_nom, toStringVal(e_NOM.getText()))
 
-  gListStore.setValue(gIter, col_prenom, toStringVal(e_PRENOM.getText()))
+  if p_EntryDataErr(e_NOM,toUpper(e_NOM.getText())):
+    echo "error eNOM"
+    return
+  else:
+    gListStore.setValue(gIter, col_nom, toStringVal(toUpper(e_NOM.getText())))
   
-  gListStore.setValue(gIter, col_age, toUIntVal(parseInt(e_AGE.getText())))
+  if p_EntryDataErr(e_PRENOM,toUpper(e_PRENOM.getText())):
+    echo "error e_PRENOM"
+    return
+  else:
+    gListStore.setValue(gIter, col_prenom, toStringVal(e_PRENOM.getText()))
+
+  if p_EntryDataErr(e_AGE,e_AGE.getText()):
+    echo "error e_AGE"
+    return
+  else:
+    gListStore.setValue(gIter, col_age, toStringVal(e_AGE.getText()))
 
   e_NOM.setText("")
   e_PRENOM.setText("")
@@ -473,7 +596,7 @@ proc p_AddRowData(b: Button) =
 
   echo fmt"p_AddRowData"
   
-  personList.add(Person(nom: e_NOM.getText() , prenom: e_PRENOM.getText(), age: parseInt(e_AGE.getText())))
+  personList.add(Person(nom: e_NOM.getText() , prenom: e_PRENOM.getText(), age: parseInt(e_AGE.getText()) ,annuel: 0, mensuel: 0 ))
 
   
   #  retrived nombre element = next ellement for add
@@ -484,12 +607,12 @@ proc p_AddRowData(b: Button) =
   var gIter: TreeIter
   gListStore.append(gIter)
   echo fmt"p_AddRowData   {vNbrPerson }"
-  gListStore.setValue(gIter, col_id,  toUIntVal(vNbrPerson + 1))
-  gListStore.setValue(gIter, col_nom, toStringVal(personList[vNbrPerson].nom))
-  gListStore.setValue(gIter, col_prenom, toStringVal(personList[vNbrPerson].prenom))
-  gListStore.setValue(gIter, col_age,  toUIntVal(personList[vNbrPerson].age))
+  gListStore.setValue(gIter, col_id,      toUIntVal(vNbrPerson + 1))
+  gListStore.setValue(gIter, col_nom,     toStringVal(personList[vNbrPerson].nom))
+  gListStore.setValue(gIter, col_prenom,  toStringVal(personList[vNbrPerson].prenom))
+  gListStore.setValue(gIter, col_age,     toStringVal(fmt"{personList[vNbrPerson].age}"))
   gListStore.setValue(gIter, color_index, toStringVal("SpringGreen"))
-  gListStore.setValue(gIter, color_data, toStringVal("cyan"))
+  gListStore.setValue(gIter, color_data,  toStringVal("cyan"))
 
 
   gSFLine.setcursor(newTreePathFromString(fmt"{vNbrPerson}"),nil,true); # position last row
@@ -506,7 +629,7 @@ proc p_AddRowData(b: Button) =
 # Procedure delete 
 #----------------------------------------------------------
 
-proc p_Delete(b: Button,pSelection:TreeSelection) =
+proc p_DltRowData(b: Button,pSelection:TreeSelection) =
 
   if ind_Selection == false  : return
 
@@ -528,12 +651,14 @@ proc p_Delete(b: Button,pSelection:TreeSelection) =
     var gIter: TreeIter
     gListStore.append(gIter) # currently we have to use setValue() as there is no varargs proc as in C original
     vPos = i
-    gListStore.setValue(gIter, col_id,  toUIntVal(i + 1))
-    gListStore.setValue(gIter, col_nom, toStringVal(personList[i].nom))
-    gListStore.setValue(gIter, col_prenom, toStringVal(personList[i].prenom))
-    gListStore.setValue(gIter, col_age,  toUIntVal(personList[i].age))
+    gListStore.setValue(gIter, col_id,      toUIntVal(i + 1))
+    gListStore.setValue(gIter, col_nom,     toStringVal(personList[i].nom))
+    gListStore.setValue(gIter, col_prenom,  toStringVal(personList[i].prenom))
+    gListStore.setValue(gIter, col_age,     toStringVal(fmt"{personList[i].age}"))
+    gListStore.setValue(gIter, col_annuel,  toStringVal(fmt"{personList[i].annuel:9.2f}"))
+    gListStore.setValue(gIter, col_mensuel, toStringVal(fmt"{personList[i].mensuel:9.2f}"))
     gListStore.setValue(gIter, color_index, toStringVal("SpringGreen"))
-    gListStore.setValue(gIter, color_data, toStringVal("cyan"))
+    gListStore.setValue(gIter, color_data,  toStringVal("cyan"))
 
   if vPerson <= vPos : 
     gSFLine.setcursor(newTreePathFromString(fmt"{vPerson}"),nil,true); # position row
@@ -548,3 +673,98 @@ proc p_Delete(b: Button,pSelection:TreeSelection) =
   queueDraw(gSFLine)
 
 
+
+#----------------------------
+# Fonction Interne
+#----------------------------
+
+
+proc toStringVal(s: string): Value =
+  let gtype = typeFromName("gchararray")
+  discard init(result, gtype)
+  setString(result, s)
+
+proc toUIntVal(i: int): Value =
+  let gtype = typeFromName("guint")
+  discard init(result, gtype)
+  setUint(result, i)
+
+proc toBoolVal(b: bool): Value =
+  let gtype = typeFromName("gboolean")
+  discard init(result, gtype)
+  setBoolean(result, b)
+
+proc toFloatVal(f: float): Value =
+  let gtype = typeFromName("gfloat")
+  discard init(result, gtype)
+  setFloat(result, f)
+
+#----------------------------
+# Fonction GTK
+#----------------------------
+
+proc mLabel(sText: string; ncar: int; style: bool = true ): Label =
+  var x = newLabel(sText)
+  x.setWidthChars(ncar)
+  if style :
+    var  contextx: StyleContext
+    contextx = getStyleContext(x)
+    contextx.addClass("text")
+  return x
+
+proc mEntry( sName: string; ncar: int; style: bool = true; sText: string = ""): Entry =
+  var x = newEntry()
+  x.set_name(sName)
+  x.setText(sText)
+  x.setWidthChars(ncar)
+  x.setMaxLength(ncar)
+  if style :
+    var  contextx: StyleContext
+    contextx = getStyleContext(x)
+    contextx.addClass("entry")
+  return x
+
+proc mButton(sName: string; sText: string; style: bool = true ): Button =
+  var x = newButton(sText)
+  x.set_name(sName)
+  var  contextx: StyleContext
+  contextx = getStyleContext(x)
+  contextx.addClass("button")
+  return x
+
+proc mTreeViewColEdit(sName: string ; col_num: int ; nbrcar: int ; col_color : int ; col_alignment: cfloat = 0.0): (TreeViewColumn , CellRendererText) =
+  var coln = newTreeViewColumn()
+  
+  var renderern = newCellRendererText()
+  var col_size:int = (nbrcar + 1) * 13
+  
+  setProperty(renderern , "editable", toBoolVal(true))
+  renderern.setAlignment(col_alignment,0.0)
+
+  coln.setAlignment(col_alignment)
+  coln.setTitle(sName)
+  coln.packStart(renderern, true)
+  coln.addAttribute(renderern, "text", col_num)
+  coln.addAttribute(renderern, "cell-background", col_color)
+  coln.setFixedWidth(col_size)
+  coln.setMaxWidth(col_size)
+
+  return (coln , renderern)
+
+proc mTreeViewColRead(sName: string; col_num: int ; nbrcar: int ;  col_color: int ; col_alignment: cfloat = 0.0 ): TreeViewColumn =
+  var coln = newTreeViewColumn()
+
+  var renderern = newCellRendererText()
+  var col_size:int = (nbrcar + 1) * 13
+
+  renderern.setAlignment(col_alignment,0.0)
+
+  coln.setAlignment(col_alignment)
+  coln.setTitle(sName)
+  coln.packStart(renderern, true)
+  coln.addAttribute(renderern, "text", col_num)
+  coln.addAttribute(renderern, "cell-background", col_color)
+  coln.setFixedWidth(col_size)
+  coln.setMaxWidth(col_size)
+
+  return coln

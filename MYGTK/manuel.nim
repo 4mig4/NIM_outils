@@ -80,7 +80,7 @@ proc toBoolVal(b: bool): Value =
 # declaration Procedure UPDATE SFL
 #----------------------------------
 
-proc p_UpdateRow(pRenderer: CellRendererText;pPath: cstring; pNewText: cstring; pColumn :TreeViewColumn )
+proc p_UpdateRow(pRenderer: CellRendererText;pPath: string; pNewText: string; pColumn :TreeViewColumn )
 
 proc p_GetRowData(pViewTree: TreeView; pPath: TreePath; pColumn: TreeViewColumn)
 
@@ -265,36 +265,40 @@ proc p_appActivate(app: Application) =
   connect(gSFLine, "row-activated", p_GetRowData)
 #---------------------------------------------------------------------------------------
 # Bind the Color column to the "cell-background" property.
-# calcul width  police monospace 20 font-size 2mm  setFixedWidth=((nombr_car +1) * 12)
-# ex: 3car + 1 tampon * 12 = 48 
+# calcul width  police monospace font-size 1em  setFixedWidth=((nombr_car +1) * 13)
+# ex: 2car + 1 tampon * 13 = 39 
 #-------------------------
-
+  var col_size:int = 0
+  col_size= ( 2 + 1 ) * 13
   coln_1.setTitle("ID")
   coln_1.packStart(renderer_1, true)
   coln_1.addAttribute(renderer_1, "text", col_id)
   coln_1.addAttribute(renderer_1, "cell-background", Color1)
-  coln_1.setFixedWidth(48)
+  coln_1.setFixedWidth(col_size)
   discard gSFLine.appendColumn(coln_1)
 
+  col_size= ( 30 + 1 ) * 13
   coln_2.setTitle("NOM")
   coln_2.packStart(renderer_2, true)
   coln_2.addAttribute(renderer_2, "text", col_nom)
   coln_2.addAttribute(renderer_2, "cell-background", Color2)
-  coln_2.setFixedWidth(372)
+  coln_2.setFixedWidth(col_size)
   discard gSFLine.appendColumn(coln_2)
 
+  col_size= ( 30 + 1 ) * 13
   coln_3.setTitle("PRENOM")
   coln_3.packStart(renderer_3, true)
   coln_3.addAttribute(renderer_3, "text", col_prenom)
   coln_3.addAttribute(renderer_3, "cell-background", Color2)
-  coln_3.setFixedWidth(372)
+  coln_3.setFixedWidth(col_size)
   discard gSFLine.appendColumn(coln_3)
 
+  col_size= ( 3 + 1 ) * 13
   coln_4.setTitle("AGE")
   coln_4.packStart(renderer_4, true)
   coln_4.addAttribute(renderer_4, "text", col_age)
   coln_4.addAttribute(renderer_4, "cell-background", Color2)
-  coln_4.setFixedWidth(48)
+  coln_4.setFixedWidth(col_size)
   discard gSFLine.appendColumn(coln_4)
 
 
@@ -391,7 +395,7 @@ main()
 #----------------------------------------------------------
 # Procedure de traitement des données saisie avec SFLine
 #----------------------------------------------------------
-proc p_updateRow(pRenderer: CellRendererText;pPath: cstring; pNewText: cstring; pColumn :TreeViewColumn ) =
+proc p_UpdateRow(pRenderer: CellRendererText;pPath: string; pNewText: string; pColumn :TreeViewColumn ) =
 
   ## update / mise à jour de la gine uniquement par en direct SFLine or Formulaire 
 

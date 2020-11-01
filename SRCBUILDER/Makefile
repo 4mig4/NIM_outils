@@ -4,8 +4,7 @@
 # désactivation des règles implicites
 .SUFFIXES:
 # nom de l'executable :
-EXEC = srcbuilder
-
+EXEC = srcbuildnim
 
 
 # Adresse des sources, des objets et des includes :

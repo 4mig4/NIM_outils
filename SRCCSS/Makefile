@@ -4,7 +4,7 @@
 # désactivation des règles implicites
 .SUFFIXES:
 # nom de l'executable :
-EXEC = srccss
+EXEC = srccssnim
 
 
 

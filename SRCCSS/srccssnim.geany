@@ -18,8 +18,8 @@ detect_indent_width=false
 indent_mode=2
 
 [project]
-name=SRCBUILDER
-base_path=$HOME/GTK/srcbuilder
+name=SRCCSS
+base_path=/home/soleil/GTK/srccssnim
 description=
 file_patterns=
 
@@ -29,9 +29,13 @@ long_line_column=120
 
 [files]
 current_page=0
+FILE_NAME_0=404;Make;0;EUTF-8;1;1;0;%2Fhome%2Fsoleil%2FGTK%2Fsrccssnim%2FMakefile;0;4
+FILE_NAME_1=0;CSS;0;EUTF-8;1;1;0;%2Fhome%2Fsoleil%2FGTK%2Fsrccssnim%2Fsrc%2Fsrcsql.css;0;4
+FILE_NAME_2=79;Pascal;0;EUTF-8;1;1;0;%2Fhome%2Fsoleil%2FGTK%2Fsrccssnim%2Fsrc%2Fsrcsql.inc;0;4
+FILE_NAME_3=3276;C++;0;EUTF-8;1;1;0;%2Fhome%2Fsoleil%2FGTK%2Fsrccssnim%2Fsrc%2Fsrccssnim.cpp;0;4
 
 [VTE]
-last_dir=/home/soleil
+last_dir=/home/soleil/CGIFCH
 
 [build-menu]
 MakeFT_00_LB=Construire
@@ -45,10 +49,10 @@ MakeFT_02_CM=make mrproper
 MakeFT_02_WD=
 filetypes=Make;C++;
 NF_03_LB=Conversion Glade
-NF_03_CM=$HOME/T_LIB/srcbuilder  -p %d  -f  %e 
+NF_03_CM=/home/soleil/T_LIB/srccssnim  -p %d  -f  %e 
 NF_03_WD=
-EX_01_LB=
-EX_01_CM=
+EX_01_LB=Conversion css
+EX_01_CM=/home/soleil/T_LIB/srccssnim  -p %d/  -f  %e 
 EX_01_WD=
 C++FT_00_LB=_Compile
 C++FT_00_CM=make -f Makefile clean  all
@@ -60,7 +64,7 @@ C++FT_02_LB=Clean
 C++FT_02_CM=make -f Makefile mrpropre
 C++FT_02_WD=%p
 NF_02_LB=GLADE
-NF_02_CM=$HOME/T_LIB/Pcall  -p %d  -f  %e -gake %e.o
+NF_02_CM=/home/soleil/T_LIB/Pcall  -p %d  -f  %e -gake %e.o
 NF_02_WD=
 
 [prjorg]

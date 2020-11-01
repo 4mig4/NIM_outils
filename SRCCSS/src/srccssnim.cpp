@@ -136,33 +136,36 @@ std::string arg_PX = argv[1];
 			}
 
 
-
-
+/*  const cssString = # note: big font selected intentionally
+    """treeview{background-color: rgba(0,255,255,1.0); font-size:30pt} treeview:selected{background-color:
+    rgba(255,255,0,1.0); color: rgba(0,0,255,1.0);}"""
+  var provider  = newCssProvider()
+  discard provider.loadFromData(cssString)
+  addProviderForScreen(getDefaultScreen(), provider, STYLE_PROVIDER_PRIORITY_APPLICATION)
+*/
 /// ecriture formaté du file.hpp pour intégrer dans votre source			
-		fwrite<<"///  fichier : "<<fileCss<<endl;
-		fwrite<<"///  " <<currentDateTime()<<endl;
+		fwrite<<"#  fichier : "<<fileCss<<endl;
+		fwrite<<"#  " <<currentDateTime()<<endl;
 		fwrite<<""<<endl;
 
 
-		fwrite<<"const char*  buildcss ="<<endl;
+		fwrite<<"const cssString =\"";
 /// lecture du fichier .css
-		string xval="";
+
 		while(getline(fread, contenu))
 		{
-			if ( xval.compare("") != 0) fwrite <<"\""<<xval<<"\"\\"<<endl;
 			replace(contenu.begin(), contenu.end(), '"', '\'');
-			xval = Trim(contenu);
+			fwrite <<Trim(contenu);
 		}
-		fwrite <<"\""<<xval<<"\";"<<endl;
-		fwrite<<"unsigned long lencss = strlen(buildcss);"<<endl;
+		fwrite <<"\""<<endl;
 		fwrite<<""<<endl;
-		fwrite<<"/* Ouverture du fichier Css */"<<endl;
-		fwrite<<"GtkCssProvider *css_provider = gtk_css_provider_new ();"<<endl;
+		fwrite<<"# Ouverture du fichier Css"<<endl;
+		fwrite<<"var provider = newCssProvider()"<<endl;
 		fwrite<<""<<endl;
-		fwrite<<"gtk_css_provider_load_from_data (css_provider, buildcss,lencss,NULL);"<<endl;
+		fwrite<<"discard provider.loadFromData(cssString)"<<endl;
 		fwrite<<""<<endl;
-		fwrite<<"gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),\\"<<endl;
-		fwrite<<"		GTK_STYLE_PROVIDER(css_provider),GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);"<<endl;
+		fwrite<<"addProviderForScreen(getDefaultScreen(), provider, STYLE_PROVIDER_PRIORITY_APPLICATION)"<<endl;
+
 		/// fin de la fonction from_data
 		fread.close(); 
 		fwrite.close();

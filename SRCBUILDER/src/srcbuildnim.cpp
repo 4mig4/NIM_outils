@@ -71,7 +71,11 @@ std::string fileSrc		="NaN";
 std::string fileGlade	="NaN";
 
 std::string contenu;
-
+std::string sxml="?xml version";
+std::string sgenerated="Generated with glade";
+std::string srequires="requires lib";
+std::string scss="interface-css";
+std::string stxt="!--";
 std::string arg_PX = argv[1];
 
 	if ((arg_PX == "-h") || (arg_PX == "-H") || (arg_PX == "--help") || argc < 5  || argc > 5 )
@@ -143,26 +147,36 @@ std::string arg_PX = argv[1];
 			}
 
 /// lecture du fichier .glade
-		getline(fread, contenu); getline(fread, contenu);  
+		string buffer ="";
+/// ecriture formaté du file.hpp pour intégrer dans votre source
 
-/// ecriture formaté du file.hpp pour intégrer dans votre source			
-		fwrite<<"///  fichier : "<<fileGlade<<endl;
-		fwrite<<"///  " <<currentDateTime()<<endl;
+		fwrite<<"#  fichier : "<<fileGlade<<endl;
+		fwrite<<"#  " <<currentDateTime()<<endl;
 		fwrite<<""<<endl;
-		fwrite<<"GtkBuilder *builder = gtk_builder_new();"<<endl;
 		fwrite<<""<<endl;
-		fwrite<<"builder = gtk_builder_new_from_string ("<<endl;
-			
+		fwrite<<"let builder = newBuilderFromString(\"";
+
 /// lecture du fichier .glade			
 		while(getline(fread, contenu))
 		{
+			if( contenu.find(sxml) != std::string::npos ) continue;
+			if( contenu.find(sgenerated) != std::string::npos ) continue;
+			if( contenu.find(srequires) != std::string::npos ) continue;
+			if( contenu.find(scss) != std::string::npos ) continue;
+			if( contenu.find(stxt) != std::string::npos ) continue;
+
+			
 			string x = Trim(contenu);
 			replace(contenu.begin(), contenu.end(), '"', '\'');
-			if ( x.compare("</interface>") != 0 ) fwrite <<"\""<<contenu<<"\""<<endl; 
+			if ( x.compare("</interface>") != 0 ){
+													buffer += Trim(contenu) + " ";
+													fwrite <<Trim(contenu)<<" ";
+												}
 			else
 			{
-				fwrite <<"\""<<contenu<<"\""<<','<<endl;
-				fwrite <<"-1);"<<endl;						/// fin de la fonction from_string
+				buffer +=Trim(contenu);
+				fwrite <<Trim(contenu);
+				fwrite <<"\","<<buffer.length()<<")";						/// fin de la fonction from_string
 			}
 		}
 

@@ -261,7 +261,7 @@ proc p_appActivate(app: Application) =
   var h = [typeFromName("guint"), typeFromName("gchararray"), typeFromName("gchararray"),typeFromName("gchararray"),
   typeFromName("gchararray"),typeFromName("gchararray"),typeFromName("gchararray"),typeFromName("gchararray")]
   
-  gListStore = newListStore(col_nbr,  cast[pointer]( unsafeaddr h)) # cast is ugly, we should fix it in bindings.
+  gListStore = newListStore(col_nbr,  cast[ptr GType]( unsafeaddr h)) # cast is ugly, we should fix it in bindings.
 
 #--------------------------------------
 # chargement data SFLine
